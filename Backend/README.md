@@ -209,21 +209,19 @@ curl -X POST http://localhost:4000/users/login \
   "message": "Invalid email or password"
 }
 ```
-## Endpoint: `/users/login`
+
+## Endpoint: `/users/profile`
 
 ### Description
-This endpoint is used to authenticate an existing user. It validates the input data, checks the credentials, and returns an authentication token along with the user details if the credentials are valid.
+This endpoint retrieves the authenticated user's profile information. Requires authentication token.
 
 ### Method
-`POST`
+`GET`
 
-### Request Body
-The request body should be a JSON object with the following structure:
-
+### Headers
 ```json
 {
-  "email": "string (valid email format, required)",
-  "password": "string (min: 6 characters, required)"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -232,7 +230,6 @@ The request body should be a JSON object with the following structure:
 #### Success (200 OK)
 ```json
 {
-  "token": "string (JWT authentication token)",
   "user": {
     "_id": "string (user ID)",
     "fullname": {
@@ -245,64 +242,53 @@ The request body should be a JSON object with the following structure:
 }
 ```
 
-#### Error (400 Bad Request)
-If validation fails, the response will contain an array of error messages:
-```json
-{
-  "errors": [
-    {
-      "msg": "string (error message)",
-      "param": "string (field name)",
-      "location": "string (location of the error, e.g., 'body')"
-    }
-  ]
-}
-```
-
 #### Error (401 Unauthorized)
-If the email or password is invalid:
 ```json
 {
-  "message": "Invalid email or password"
+  "message": "Authentication required"
 }
 ```
 
 ### Status Codes
-- `200 OK`: User successfully authenticated.
-- `400 Bad Request`: Validation errors or missing required fields.
-- `401 Unauthorized`: Invalid email or password.
+- `200 OK`: Profile retrieved successfully
+- `401 Unauthorized`: Invalid or missing authentication token
 
-### Example Request
-```bash
-curl -X POST http://localhost:4000/users/login \
--H "Content-Type: application/json" \
--d '{
-  "email": "john.doe@example.com",
-  "password": "password123"
-}'
-```
+## Endpoint: `/users/logout`
 
-### Example Response
+### Description
+This endpoint logs out the current user by invalidating their authentication token and clearing cookies. Requires authentication token.
 
-#### Success
+### Method
+`GET`
+
+### Headers
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "_id": "64f1c2e4b5d1a2f3c4e5d6a7",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Doe"
-    },
-    "email": "john.doe@example.com",
-    "socketId": null
-  }
+  "Authorization": "Bearer <token>"
 }
 ```
 
-#### Error
+### Response
+
+#### Success (200 OK)
 ```json
 {
-  "message": "Invalid email or password"
+  "message": "Logged out successfully"
 }
 ```
+
+#### Error (401 Unauthorized)
+```json
+{
+  "message": "Authentication required"
+}
+```
+
+### Status Codes
+- `200 OK`: User successfully logged out
+- `401 Unauthorized`: Invalid or missing authentication token
+
+### Additional Notes
+- The logout endpoint blacklists the current token
+- Clears the authentication cookie if present
+- After logout, the token cannot be reused for authentication
