@@ -40,14 +40,19 @@ module.exports.loginUser = async(req,res,next) => {
     }
 
     const {email, password} = req.body;
+
+    console.log("Login Attempt:", { email, password }); 
+
     const user = await userModel.findOne({email}).select('+password');
 
     if(!user){
+        console.log("Error: User not found in DB");
         return res.status(401).json({message: 'Invalid email or password'});
     }
 
     const isMatch = await user.comparePassword(password);
     if(!isMatch){
+        console.log("Error: Password does not match hash");
         return res.status(401).json({message: 'Invalid email or password'});
     }
 
@@ -58,7 +63,7 @@ module.exports.loginUser = async(req,res,next) => {
 }
 
 module.exports.getUserProfile = async(req,res,next) => {
-    res.status(200).json({user: req.user});
+    res.status(200).json({ user: req.user });
 }
 
 module.exports.logoutUser = async(req,res,next) => {

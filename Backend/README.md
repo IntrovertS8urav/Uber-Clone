@@ -555,3 +555,43 @@ curl -X POST http://localhost:4000/captains/register \
 - JWT token is generated with 24-hour expiry
 - Vehicle details are validated before registration
 
+
+## Endpoint: `/rides/get-fare`
+
+### Description
+This endpoint calculates the estimated fare for a ride based on the pickup and destination locations. It uses the Google Maps API to calculate the distance and time between the two locations and applies predefined rates for different vehicle types.
+
+### Method
+`GET`
+
+### Authentication
+Requires Bearer token in the Authorization header.
+
+```http
+Authorization: Bearer <jwt_token>
+
+{
+  "auto": 50.5,  // Estimated fare for auto
+  "car": 75.3,   // Estimated fare for car
+  "moto": 40.2   // Estimated fare for motorcycle
+}
+
+{
+  "errors": [
+    {
+      "msg": "Invalid pickup location",
+      "param": "pickup",
+      "location": "query"
+    },
+    {
+      "msg": "Invalid dropoff location",
+      "param": "destination",
+      "location": "query"
+    }
+  ]
+}
+
+
+{
+  "error": "Error message describing the issue"
+}
